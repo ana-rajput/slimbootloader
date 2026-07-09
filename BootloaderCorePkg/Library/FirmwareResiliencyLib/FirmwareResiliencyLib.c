@@ -184,8 +184,8 @@ UnifiedResiliencyCheck (
   BOOLEAN           NeedPartitionSwitch;
   UINT8             NewReason;
   BOOT_PARTITION    NewPartition;
-  // Skip during FW update boots.
-  if (GetBootMode () == BOOT_ON_FLASH_UPDATE) {
+  // Skip explicit capsule-update boots; still run for recovery-triggered boots.
+  if ((GetBootMode () == BOOT_ON_FLASH_UPDATE) && !IsRecoveryTriggered ()) {
     return;
   }
   //
@@ -220,9 +220,9 @@ UnifiedResiliencyCheck (
   } else {
     VarExists = (!EFI_ERROR (EfiStatus) && (Size == sizeof (RECOVERY_STATUS)));
     if (VarExists && (Status.Revision != RECOVERY_STATUS_REVISION)) {
-    DEBUG ((DEBUG_WARN, "Resiliency: invalid RecoveryStatus revision %u, deleting\n", Status.Revision));
-    DeleteRecoveryStatus ();
-    VarExists = FALSE;
+      DEBUG ((DEBUG_WARN, "Resiliency: invalid RecoveryStatus revision %u, deleting\n", Status.Revision));
+      DeleteRecoveryStatus ();
+      VarExists = FALSE;
     }
   }
 
