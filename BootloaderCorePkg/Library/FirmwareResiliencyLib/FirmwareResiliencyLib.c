@@ -282,7 +282,7 @@ UnifiedResiliencyCheck (
       if (EFI_ERROR (EfiStatus)) {
         CpuHalt ("Resiliency: failed to persist TCO counter state\n");
       }
-      if (Status.Reason == RECOVERY_REASON_NONE) {
+      if ((Status.Reason == RECOVERY_REASON_NONE) && (NewReason == RECOVERY_REASON_NONE)) {
         return;
       }
     }
