@@ -219,11 +219,14 @@ UnifiedResiliencyCheck (
     }
   } else {
     VarExists = (!EFI_ERROR (EfiStatus) && (Size == sizeof (RECOVERY_STATUS)));
+    if (VarExists && (Status.Revision != RECOVERY_STATUS_REVISION)) {
+    DEBUG ((DEBUG_WARN, "Resiliency: invalid RecoveryStatus revision %u, deleting\n", Status.Revision));
+    DeleteRecoveryStatus ();
+    VarExists = FALSE;
+    }
   }
 
-  //
   // If variable exists, handle post-recovery and stale-counter cleanup.
-  //
   if (VarExists) {
     // Clear state after successful recovery.
     if (Status.LastResult == RECOVERY_RESULT_SUCCESS) {
@@ -348,6 +351,7 @@ UnifiedResiliencyCheck (
   //
   SetRecoveryTrigger ();
 
+  SetBootMode (BOOT_ON_FLASH_UPDATE);
   //
   // Switch partition and cold reset when required.
   //
