@@ -204,7 +204,7 @@ UnifiedResiliencyCheck (
   // Handle old RecoveryStatus size from prior builds.
   if (!EFI_ERROR (EfiStatus) && (Size != sizeof (RECOVERY_STATUS))) {
     if ((Status.Reason != RECOVERY_REASON_NONE) || (Status.LastResult == RECOVERY_RESULT_PENDING)) {
-      DEBUG ((DEBUG_INFO, "Resiliency: detected old format with active recovery (size %u), migrating\n", Size));
+      DEBUG ((DEBUG_INFO, "Resiliency: detected old format with active recovery (size %u), migrating\n", (UINTN)Size));
       Status.Revision = RECOVERY_STATUS_REVISION;
       Status.Reserved = 0;
       EfiStatus = SaveRecoveryStatus (&Status);
@@ -213,7 +213,7 @@ UnifiedResiliencyCheck (
       }
       VarExists = TRUE;
     } else {
-      DEBUG ((DEBUG_INFO, "Resiliency: detected stale old format RecoveryStatus (size %u), deleting\n", Size));
+      DEBUG ((DEBUG_INFO, "Resiliency: detected stale old format RecoveryStatus (size %u), deleting\n", (UINTN)Size));
       DeleteRecoveryStatus ();
       VarExists = FALSE;
     }
@@ -233,7 +233,7 @@ UnifiedResiliencyCheck (
       DEBUG ((DEBUG_INFO, "Resiliency: recovery succeeded, clearing state\n"));
       DeleteRecoveryStatus ();
       ClearRecoveryTrigger ();
-      return;
+      VarExists = FALSE;
     }
 
     // Drop stale non-consecutive TCO count.
@@ -242,7 +242,7 @@ UnifiedResiliencyCheck (
         !WasBootCausedByTcoTimeout ()) {
       DEBUG ((DEBUG_INFO, "Resiliency: clearing stale TCO boot counter\n"));
       DeleteRecoveryStatus ();
-      return;
+      VarExists = FALSE;
     }
   }
 
